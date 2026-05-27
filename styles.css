@@ -165,17 +165,12 @@ footer {
 }
 
 .hero .logo-large {
-  width: 80px;
-  height: 80px;
-  background: var(--primary);
-  border-radius: 18px;
+  width: 96px;
+  height: 96px;
+  border-radius: 22px;
   margin: 0 auto 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 36px;
+  display: block;
+  object-fit: cover;
 }
 
 .hero h1 {

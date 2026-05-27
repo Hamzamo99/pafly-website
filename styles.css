@@ -51,21 +51,16 @@ header.top {
 header.top .logo {
   width: 36px;
   height: 36px;
-  background: var(--primary);
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 700;
-  font-size: 18px;
+  object-fit: cover;
+  display: block;
 }
 
 header.top h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-  color: var(--text);
+  color: var(--primary);
 }
 
 header.top nav {
@@ -178,6 +173,7 @@ footer {
   margin: 0 0 12px;
   font-weight: 700;
   letter-spacing: -1px;
+  color: var(--primary);
 }
 
 .hero p.tagline {

@@ -1,17 +1,16 @@
 /**
- * Regenerates privacy/, terms/ and support/ from the mobile app's translation files, so the
- * published pages always say exactly what the in-app screens say.
+ * Regenerates privacy/ and terms/ from the mobile app's translation files, so the published
+ * pages always say exactly what the in-app screens say.
  *
  * Why generate rather than edit by hand: these pages and the app drifted for four months. The
  * published policy still claimed the device identifier is deleted when you delete your account,
  * which the app stopped doing — a false statement about a persistent identifier, on the page
  * Apple links to. Copying text across two repos by hand is what produced that, and it would
- * produce it again. The support page has the same exposure: its FAQ answers describe message
- * limits, moderation and account deletion, all of which change in the app.
+ * produce it again.
  *
  * Usage:
- *   node scripts/generate-pages.mjs
- *   APP_DIR=/path/to/Pafly-Mobile-App node scripts/generate-pages.mjs
+ *   node scripts/generate-legal.mjs
+ *   APP_DIR=/path/to/Pafly-Mobile-App node scripts/generate-legal.mjs
  *
  * Re-run it whenever src/i18n/en.json changes in the app, then commit the result.
  */
@@ -29,14 +28,10 @@ const APP_NAME = 'Pafly';
 /** The site is English-only for now; the app also ships `fr.json` if that changes. */
 const LOCALE_FILE = join(APP_DIR, 'src', 'i18n', 'en.json');
 
-/**
- * `kind` picks the renderer: 'legal' walks paragraphs/blocks/bullets, 'faq' walks
- * question/answer items. `nav` is the label in the header and footer of every page.
- */
+/** `nav` is the label this page gets in the header nav and in every other page's footer. */
 const PAGES = [
   {
     doc: 'privacy',
-    kind: 'legal',
     slug: 'privacy',
     nav: 'Privacy',
     dateSource: join(APP_DIR, 'app', 'privacy.tsx'),
@@ -47,7 +42,6 @@ const PAGES = [
   },
   {
     doc: 'terms',
-    kind: 'legal',
     slug: 'terms',
     nav: 'Terms',
     dateSource: join(APP_DIR, 'app', 'terms.tsx'),
@@ -55,17 +49,6 @@ const PAGES = [
     headTitle: 'Terms of Service — Pafly',
     description:
       "Pafly's Terms of Service. The rules for using our anonymous message exchange app.",
-  },
-  {
-    doc: 'help',
-    kind: 'faq',
-    slug: 'support',
-    nav: 'Support',
-    dateSource: join(APP_DIR, 'app', 'help.tsx'),
-    pageTitle: 'Help & Support',
-    headTitle: 'Help & Support — Pafly',
-    description:
-      'Answers to common questions about Pafly, and how to reach us. Anonymous message exchange, one message a day.',
   },
 ];
 
@@ -140,46 +123,6 @@ function renderLegalSection(section, { isContactSection, contactEmail, formatted
   return `    <section>\n${out.join('\n')}\n    </section>`;
 }
 
-/** One FAQ group: a heading, then each question as a subheading with its answer. */
-function renderFaqSection(section, formattedDate) {
-  const out = [`      <h2>${fill(section.title, formattedDate)}</h2>`];
-
-  for (const item of section.items) {
-    out.push(`      <h3>${fill(item.question, formattedDate)}</h3>`);
-    out.push(`      <p>${fill(item.answer, formattedDate)}</p>`);
-  }
-
-  return `    <section>\n${out.join('\n')}\n    </section>`;
-}
-
-/** The contact block that closes the support page. */
-function renderContactSection(doc, formattedDate) {
-  return `    <section>
-      <h2>${fill(doc.contactTitle, formattedDate)}</h2>
-      <p>${fill(doc.contactDescription, formattedDate)}</p>
-      <p><a href="mailto:${doc.contactEmail}">${doc.contactEmail}</a></p>
-    </section>`;
-}
-
-function renderBody(page, doc, formattedDate) {
-  if (page.kind === 'faq') {
-    return [
-      ...doc.sections.map((section) => renderFaqSection(section, formattedDate)),
-      renderContactSection(doc, formattedDate),
-    ].join('\n\n');
-  }
-
-  return doc.sections
-    .map((section, i) =>
-      renderLegalSection(section, {
-        isContactSection: i === doc.sections.length - 1,
-        contactEmail: doc.contactEmail,
-        formattedDate,
-      })
-    )
-    .join('\n\n');
-}
-
 function renderPage(page, locale) {
   const doc = locale[page.doc];
   const formattedDate = formatDate(readLastUpdated(page.dateSource));
@@ -192,6 +135,16 @@ function renderPage(page, locale) {
     ),
     '<a href="/">Home</a>',
   ];
+
+  const body = doc.sections
+    .map((section, i) =>
+      renderLegalSection(section, {
+        isContactSection: i === doc.sections.length - 1,
+        contactEmail: doc.contactEmail,
+        formattedDate,
+      })
+    )
+    .join('\n\n');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -220,7 +173,7 @@ function renderPage(page, locale) {
       ${fill(doc.intro, formattedDate)}
     </p>
 
-${renderBody(page, doc, formattedDate)}
+${body}
 
     <footer>
       © ${new Date().getUTCFullYear()} Pafly. ${footerLinks.join(' · ')}
@@ -240,13 +193,7 @@ for (const page of PAGES) {
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, renderPage(page, locale));
 
-  const doc = locale[page.doc];
-  const count =
-    page.kind === 'faq'
-      ? doc.sections.reduce((n, s) => n + s.items.length, 0)
-      : doc.sections.length;
-  const unit = page.kind === 'faq' ? 'questions' : 'sections';
-  console.log(`✓ ${page.slug}/index.html — ${count} ${unit}`);
+  console.log(`✓ ${page.slug}/index.html — ${locale[page.doc].sections.length} sections`);
 }
 
 console.log(`\nSource: ${LOCALE_FILE.replace(APP_DIR + '/', 'Pafly-Mobile-App/')}`);

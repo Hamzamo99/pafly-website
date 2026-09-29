@@ -221,8 +221,11 @@ footer {
   transition: border-color 0.15s, transform 0.15s;
 }
 
-.hero .contact-line {
-  margin: 24px 0 0;
+/* The published contact point. It sits at the end of the intro section rather than in
+   the hero, so it reads as part of the explanation instead of a fourth button. The class
+   beats `section p` on specificity, so the margin below is the one that applies. */
+.contact-line {
+  margin: 20px 0 0;
   font-size: 14px;
   color: var(--text-secondary);
 }

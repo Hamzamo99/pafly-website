@@ -221,6 +221,12 @@ footer {
   transition: border-color 0.15s, transform 0.15s;
 }
 
+.hero .contact-line {
+  margin: 24px 0 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
 .hero .links a:hover {
   border-color: var(--primary);
   text-decoration: none;

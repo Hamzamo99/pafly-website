@@ -33,10 +33,29 @@ html, body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Sticky footer. The landing page is short enough that the footer used to stop
+   wherever the text ended, leaving it stranded mid-screen above a band of empty
+   background. Body and container are flex columns so `footer { margin-top: auto }`
+   absorbs the leftover height and parks the footer at the bottom; on a long page
+   there is no leftover height and nothing moves.
+   vh is declared first as the fallback and dvh overrides it where supported: on
+   mobile, 100vh measures the viewport *without* the collapsing address bar, so it
+   overflows by that bar's height and reintroduces the stranded footer. */
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
 .container {
   max-width: 720px;
+  width: 100%;
   margin: 0 auto;
-  padding: 32px 24px 64px;
+  padding: 32px 24px 40px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 header.top {
@@ -145,7 +164,9 @@ a:hover {
 }
 
 footer {
-  margin-top: 48px;
+  /* auto, not a fixed margin — see the sticky-footer note above. The gap on a full
+     page comes from the preceding section's own bottom margin plus this padding. */
+  margin-top: auto;
   padding-top: 24px;
   border-top: 1px solid var(--border);
   color: var(--text-light);

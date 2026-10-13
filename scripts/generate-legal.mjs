@@ -55,6 +55,7 @@ const LOCALES = [
     base: '',
     label: 'English',
     home: 'Home',
+    homeHref: '/',
     pages: {
       privacy: {
         nav: 'Privacy',
@@ -79,6 +80,7 @@ const LOCALES = [
     base: 'fr',
     label: 'Français',
     home: 'Accueil',
+    homeHref: '/fr/',
     pages: {
       privacy: {
         nav: 'Confidentialité',
@@ -200,14 +202,14 @@ function renderPage(page, locale, translations) {
   // Header nav lists every page in this language; the footer lists the others plus Home, then
   // the same document in each other language so both translations are reachable from either.
   const nav = [
-    `<a href="/">${escapeHtml(locale.home)}</a>`,
+    `<a href="${locale.homeHref}">${escapeHtml(locale.home)}</a>`,
     ...PAGES.map((p) => `<a href="${pageHref(locale, p.slug)}">${escapeHtml(locale.pages[p.doc].nav)}</a>`),
   ];
   const footerLinks = [
     ...PAGES.filter((p) => p.slug !== page.slug).map(
       (p) => `<a href="${pageHref(locale, p.slug)}">${escapeHtml(locale.pages[p.doc].nav)}</a>`
     ),
-    `<a href="/">${escapeHtml(locale.home)}</a>`,
+    `<a href="${locale.homeHref}">${escapeHtml(locale.home)}</a>`,
     ...LOCALES.filter((l) => l.code !== locale.code).map(
       (l) =>
         `<a href="${pageHref(l, page.slug)}" lang="${l.code}" hreflang="${l.code}">${escapeHtml(l.label)}</a>`
